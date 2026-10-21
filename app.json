@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ZPSM",
-    "slug": "ZPSM",
+    "name": "ZPSM-Kalkulator",
+    "slug": "zpsm-kalkulator",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
