@@ -88,8 +88,11 @@ function tokenize(expression: string): Token[] {
 
 class ExpressionParser {
   private position = 0;
+  private readonly tokens: Token[];
 
-  constructor(private readonly tokens: Token[]) {}
+  constructor(tokens: Token[]) {
+    this.tokens = tokens;
+  }
 
   parse(): number {
     if (this.tokens.length === 0) {

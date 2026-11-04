@@ -10,28 +10,14 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { evaluateExpression, formatResult } from './calculator';
+import { Keypad } from './src/components/Keypad';
+import { BASIC_KEYS, EXTENDED_KEYS } from './src/keys';
 
 type Screen = 'exercise' | 'calculator';
 
 const tabs: { id: Screen; label: string }[] = [
   { id: 'exercise', label: 'Ćwiczenie' },
   { id: 'calculator', label: 'Kalkulator' },
-];
-
-const basicKeys = [
-  ['AC', '±', '%', '÷'],
-  ['7', '8', '9', '×'],
-  ['4', '5', '6', '−'],
-  ['1', '2', '3', '+'],
-  ['0', ',', '⌫', '='],
-];
-
-const extendedKeys = [
-  ['(', ')'],
-  ['x²', '√('],
-  ['1/x', '^'],
-  ['π', 'e'],
-  ['AC', '⌫'],
 ];
 
 const binaryOperators = ['+', '−', '×', '÷', '^'];
@@ -82,50 +68,6 @@ function findLastOperandStart(expression: string): number | null {
 
 function endsWithValue(expression: string): boolean {
   return /(?:\d|π|e|%|\))$/.test(expression);
-}
-
-type KeypadProps = {
-  compact: boolean;
-  rows: string[][];
-  onPress: (symbol: string) => void;
-};
-
-function Keypad({ compact, rows, onPress }: KeypadProps) {
-  return (
-    <View style={styles.keypad}>
-      {rows.map((row, rowIndex) => (
-        <View key={rowIndex} style={styles.keyRow}>
-          {row.map((symbol) => (
-            <Pressable
-              accessibilityLabel={
-                symbol === 'AC'
-                  ? 'Wyczyść wyświetlacz'
-                  : symbol === '⌫'
-                    ? 'Usuń ostatni znak'
-                    : `Dodaj ${symbol}`
-              }
-              accessibilityRole="button"
-              key={symbol}
-              onPress={() => onPress(symbol)}
-              style={({ pressed }) => [
-                styles.key,
-                pressed && styles.pressedKey,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.keyLabel,
-                  compact && styles.keyLabelLandscape,
-                ]}
-              >
-                {symbol}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
-      ))}
-    </View>
-  );
 }
 
 export default function App() {
@@ -467,13 +409,13 @@ export default function App() {
             >
               <Keypad
                 compact={landscape}
-                rows={basicKeys}
+                keys={BASIC_KEYS}
                 onPress={handleCalculatorButton}
               />
               {landscape && (
                 <Keypad
                   compact
-                  rows={extendedKeys}
+                  keys={EXTENDED_KEYS}
                   onPress={handleCalculatorButton}
                 />
               )}
@@ -663,32 +605,5 @@ const styles = StyleSheet.create({
   keypadsLandscape: {
     flexDirection: 'row',
     gap: 8,
-  },
-  keypad: {
-    flex: 1,
-    gap: 8,
-  },
-  keyRow: {
-    flex: 1,
-    flexDirection: 'row',
-    gap: 8,
-  },
-  key: {
-    alignItems: 'center',
-    backgroundColor: '#23395d',
-    borderRadius: 18,
-    flex: 1,
-    justifyContent: 'center',
-  },
-  pressedKey: {
-    backgroundColor: '#315c9b',
-  },
-  keyLabel: {
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  keyLabelLandscape: {
-    fontSize: 18,
   },
 });
