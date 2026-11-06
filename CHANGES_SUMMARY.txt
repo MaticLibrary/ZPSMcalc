@@ -1,0 +1,63 @@
+Zmienione / dodane elementy w projekcie kalkulatora
+
+1) package.json
+- dodano devDependency:
+  "@types/node": "^24.0.0"
+- dodano skrypty testowe:
+  "test": "node --test"
+  "check": "tsc --noEmit"
+
+2) tsconfig.json
+- dodano:
+  "allowImportingTsExtensions": true
+  "types": ["node"]
+- to pozwala na import plikow .ts w testach Node oraz na poprawne rozpoznawanie modułów node:test i node:assert
+
+3) calculator.ts
+- dodano klasę:
+  export class ExpressionError extends Error {
+    constructor(message: string) {
+      super(message);
+      this.name = 'ExpressionError';
+    }
+  }
+- dodano funkcję:
+  export function evaluate(input: string): number {
+    try {
+      return evaluateExpression(input.trim());
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new ExpressionError(error.message);
+      }
+      throw error;
+    }
+  }
+- ta funkcja jest wrapperem nad istniejącym evaluateExpression i zamienia błędy w czytelny typ ExpressionError
+
+4) nowy plik: src/logic/evaluate.ts
+- zawiera czystą funkcję evaluate(input: string): number
+- importuje evaluator z ../../calculator.ts
+- wyrzuca ExpressionError zamiast surowego Error
+- po stronie logiki jest oddzielona od UI, zgodnie z założeniem laboratorium
+
+5) nowy plik: src/logic/evaluate.test.ts
+- zawiera testy dla:
+  - prostego dodawania
+  - kolejności działań
+  - operatorów klawiaturowych (×, ÷, −, przecinek)
+  - procentu, potęgi, pierwiastka
+  - dzielenia przez zero
+  - niekompletnego wyrażenia
+
+Przykładowe testy w pliku:
+- assert.equal(evaluate('2 + 2 * 2'), 6);
+- assert.equal(evaluate('(2 + 2) * 2'), 8);
+- assert.equal(evaluate('9 ÷ 3'), 3);
+- assert.throws(() => evaluate('3 ÷ 0'), (error) => error instanceof ExpressionError);
+- assert.throws(() => evaluate('2 +'), (error) => error instanceof ExpressionError);
+
+Podsumowanie:
+- dodano środowisko testowe Node + TypeScript
+- dodano testy opisujące zachowanie kalkulatora
+- dodano osobną warstwę logiki do liczenia wyrażeń
+- poprawiono obsługę błędów w formie czytelnych wyjątków
