@@ -5,12 +5,14 @@ type CalculatorKeyProps = {
   compact: boolean;
   item: Key;
   onPress: (label: string) => void;
+  theme: 'light' | 'dark';
 };
 
 export function CalculatorKey({
   compact,
   item,
   onPress,
+  theme,
 }: CalculatorKeyProps) {
   const accessibilityLabel =
     item.label === 'AC'
@@ -19,6 +21,21 @@ export function CalculatorKey({
         ? 'Usuń ostatni znak'
         : `Dodaj ${item.label}`;
 
+  const roleBackgrounds: Record<KeyRole, string> =
+    theme === 'dark'
+      ? {
+          digit: '#161d29',
+          operator: '#232d39',
+          equals: '#a9895a',
+          clear: '#5f474d',
+        }
+      : {
+          digit: '#23395d',
+          operator: '#315c9b',
+          equals: '#16805d',
+          clear: '#b42318',
+        };
+
   return (
     <Pressable
       accessibilityLabel={accessibilityLabel}
@@ -26,8 +43,7 @@ export function CalculatorKey({
       onPress={() => onPress(item.label)}
       style={({ pressed }) => [
         styles.key,
-        ROLE_VIEW[item.role],
-        { flex: item.span ?? 1 },
+        { flex: item.span ?? 1, backgroundColor: roleBackgrounds[item.role] },
         pressed && styles.pressedKey,
       ]}
     >
@@ -44,18 +60,6 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
   },
-  digitKey: {
-    backgroundColor: '#23395d',
-  },
-  operatorKey: {
-    backgroundColor: '#315c9b',
-  },
-  equalsKey: {
-    backgroundColor: '#16805d',
-  },
-  clearKey: {
-    backgroundColor: '#b42318',
-  },
   pressedKey: {
     opacity: 0.75,
   },
@@ -68,10 +72,3 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-
-const ROLE_VIEW: Record<KeyRole, ViewStyle> = {
-  digit: styles.digitKey,
-  operator: styles.operatorKey,
-  equals: styles.equalsKey,
-  clear: styles.clearKey,
-};

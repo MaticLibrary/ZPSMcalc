@@ -6,9 +6,10 @@ type KeypadProps = {
   compact: boolean;
   keys: Key[][];
   onPress: (label: string) => void;
+  theme: 'light' | 'dark';
 };
 
-export function Keypad({ compact, keys, onPress }: KeypadProps) {
+export function Keypad({ compact, keys, onPress, theme }: KeypadProps) {
   return (
     <View style={styles.keypad}>
       {keys.map((row, rowIndex) => (
@@ -19,6 +20,7 @@ export function Keypad({ compact, keys, onPress }: KeypadProps) {
               item={item}
               key={item.label}
               onPress={onPress}
+              theme={theme}
             />
           ))}
         </View>

@@ -73,12 +73,57 @@ function endsWithValue(expression: string): boolean {
 export default function App() {
   const [screen, setScreen] = useState<Screen>('exercise');
   const [visible, setVisible] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [expression, setExpression] = useState('');
   const [calculationError, setCalculationError] = useState('');
   const [justEvaluated, setJustEvaluated] = useState(false);
   const displayRef = useRef<ScrollView>(null);
   const { width, height } = useWindowDimensions();
   const landscape = width > height;
+  const isDark = theme === 'dark';
+  const palette = isDark
+    ? {
+        background: '#090b10',
+        panel: '#121821',
+        panelAlt: '#1a202b',
+        tab: '#171d27',
+        selectedTab: '#b79d71',
+        selectedTabText: '#f5f0e8',
+        text: '#f3efe8',
+        muted: '#a6a39d',
+        accent: '#d8c29a',
+        accentStrong: '#b79d71',
+        display: '#111720',
+        displayBorder: '#2b313d',
+        nameCard: '#171f2b',
+        zoneOne: '#171f2a',
+        zoneTwo: '#1b2424',
+        zoneThree: '#201b2d',
+        toggle: '#171d27',
+        toggleBorder: '#2d3543',
+        error: '#d98c8c',
+      }
+    : {
+        background: '#f5f7fb',
+        panel: '#e8ecf4',
+        panelAlt: '#ffffff',
+        tab: '#e8ecf4',
+        selectedTab: '#23395d',
+        selectedTabText: '#ffffff',
+        text: '#18243a',
+        muted: '#67758d',
+        accent: '#315c9b',
+        accentStrong: '#23395d',
+        display: '#ffffff',
+        displayBorder: '#e2e7ef',
+        nameCard: '#e5edf9',
+        zoneOne: '#e6edf8',
+        zoneTwo: '#e4f1ec',
+        zoneThree: '#f8eddf',
+        toggle: '#eef3ff',
+        toggleBorder: '#dfe7f5',
+        error: '#b42318',
+      };
 
   function appendOperand(currentExpression: string, operand: string): string {
     const lastCharacter = currentExpression[currentExpression.length - 1];
@@ -290,85 +335,115 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView
         edges={['top', 'bottom', 'left', 'right']}
-        style={styles.safeArea}
+        style={[styles.safeArea, { backgroundColor: palette.background }]}
       >
-        <StatusBar style="dark" />
-        <View style={styles.tabs}>
-          {tabs.map((tab) => (
-            <Pressable
-              accessibilityRole="tab"
-              accessibilityState={{ selected: screen === tab.id }}
-              key={tab.id}
-              onPress={() => setScreen(tab.id)}
-              style={[styles.tab, screen === tab.id && styles.selectedTab]}
-            >
-              <Text
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <View style={[styles.headerRow, { backgroundColor: palette.background }]}>
+          <View style={styles.tabs}>
+            {tabs.map((tab) => (
+              <Pressable
+                accessibilityRole="tab"
+                accessibilityState={{ selected: screen === tab.id }}
+                key={tab.id}
+                onPress={() => setScreen(tab.id)}
                 style={[
-                  styles.tabLabel,
-                  screen === tab.id && styles.selectedTabLabel,
+                  styles.tab,
+                  {
+                    backgroundColor:
+                      screen === tab.id ? palette.selectedTab : palette.tab,
+                  },
                 ]}
               >
-                {tab.label}
-              </Text>
-            </Pressable>
-          ))}
+                <Text
+                  style={[
+                    styles.tabLabel,
+                    {
+                      color:
+                        screen === tab.id
+                          ? palette.selectedTabText
+                          : palette.muted,
+                    },
+                  ]}
+                >
+                  {tab.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setTheme((currentTheme) => (currentTheme === 'dark' ? 'light' : 'dark'))}
+            style={[
+              styles.themeToggle,
+              {
+                backgroundColor: palette.toggle,
+                borderColor: palette.toggleBorder,
+              },
+            ]}
+          >
+            <Text style={[styles.themeToggleText, { color: palette.text }]}>
+              {isDark ? 'Light' : 'Dark'}
+            </Text>
+          </Pressable>
         </View>
 
         {screen === 'exercise' ? (
-          <View style={styles.page}>
+          <View style={[styles.page, { backgroundColor: palette.background }]}>
             <View style={styles.exerciseHeader}>
-              <Text style={styles.eyebrow}>PIERWSZA APLIKACJA</Text>
-              <Text style={styles.title}>Flexbox i stan</Text>
+              <Text style={[styles.eyebrow, { color: palette.muted }]}>PIERWSZA APLIKACJA</Text>
+              <Text style={[styles.title, { color: palette.text }]}>Flexbox i stan</Text>
               <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ expanded: visible }}
                 onPress={() => setVisible((currentVisible) => !currentVisible)}
-                style={styles.nameButton}
+                style={[styles.nameButton, { backgroundColor: palette.accentStrong }]}
               >
                 <Text style={styles.nameButtonLabel}>
                   {visible ? 'Ukryj imię i nazwisko' : 'Pokaż imię i nazwisko'}
                 </Text>
               </Pressable>
               {visible && (
-                <View style={styles.nameCard}>
-                  <Text style={styles.name}>Robert Kłusek</Text>
-                  <Text style={styles.nameCaption}>Widok sterowany stanem</Text>
+                <View style={[styles.nameCard, { backgroundColor: palette.nameCard }]}>
+                  <Text style={[styles.name, { color: palette.text }]}>Robert Kłusek</Text>
+                  <Text style={[styles.nameCaption, { color: palette.muted }]}>Widok sterowany stanem</Text>
                 </View>
               )}
             </View>
 
             <View style={styles.middle}>
-              <View style={[styles.zone, styles.zoneOne]}>
-                <Text style={styles.zoneNumber}>01</Text>
-                <Text style={styles.zoneLabel}>Komponent</Text>
+              <View style={[styles.zone, styles.zoneOne, { backgroundColor: palette.zoneOne }]}>
+                <Text style={[styles.zoneNumber, { color: palette.accent }]}>01</Text>
+                <Text style={[styles.zoneLabel, { color: palette.text }]}>Komponent</Text>
               </View>
-              <View style={[styles.zone, styles.zoneTwo]}>
-                <Text style={styles.zoneNumber}>02</Text>
-                <Text style={styles.zoneLabel}>Flexbox</Text>
+              <View style={[styles.zone, styles.zoneTwo, { backgroundColor: palette.zoneTwo }]}>
+                <Text style={[styles.zoneNumber, { color: palette.accent }]}>02</Text>
+                <Text style={[styles.zoneLabel, { color: palette.text }]}>Flexbox</Text>
               </View>
-              <View style={[styles.zone, styles.zoneThree]}>
-                <Text style={styles.zoneNumber}>03</Text>
-                <Text style={styles.zoneLabel}>Stan</Text>
+              <View style={[styles.zone, styles.zoneThree, { backgroundColor: palette.zoneThree }]}>
+                <Text style={[styles.zoneNumber, { color: palette.accent }]}>03</Text>
+                <Text style={[styles.zoneLabel, { color: palette.text }]}>Stan</Text>
               </View>
             </View>
 
             <View style={styles.footer}>
-              <Text style={styles.footerLabel}>ZPSM · LABORATORIUM 3</Text>
+              <Text style={[styles.footerLabel, { color: palette.muted }]}>ZPSM · LABORATORIUM 3</Text>
             </View>
           </View>
         ) : (
-          <View style={styles.page}>
+          <View style={[styles.page, { backgroundColor: palette.background }]}>
             <View
               style={[
                 styles.calculatorHeader,
                 landscape && styles.calculatorHeaderLandscape,
               ]}
             >
-              <Text style={styles.eyebrow}>POCZĄTEK PROJEKTU</Text>
+              <Text style={[styles.eyebrow, { color: palette.muted }]}>POCZĄTEK PROJEKTU</Text>
               <Text
                 style={[
                   styles.title,
                   landscape && styles.calculatorTitleLandscape,
+                  { color: palette.text },
                 ]}
               >
                 Kalkulator
@@ -378,6 +453,10 @@ export default function App() {
               style={[
                 styles.display,
                 landscape && styles.displayLandscape,
+                {
+                  backgroundColor: palette.display,
+                  borderColor: palette.displayBorder,
+                },
               ]}
             >
               <ScrollView
@@ -394,7 +473,10 @@ export default function App() {
                   style={[
                     styles.expression,
                     landscape && styles.expressionLandscape,
-                    calculationError && styles.errorExpression,
+                    calculationError && {
+                      color: palette.error,
+                    },
+                    !calculationError && { color: palette.text },
                   ]}
                 >
                   {calculationError || expression || '0'}
@@ -411,12 +493,14 @@ export default function App() {
                 compact={landscape}
                 keys={BASIC_KEYS}
                 onPress={handleCalculatorButton}
+                theme={theme}
               />
               {landscape && (
                 <Keypad
                   compact
                   keys={EXTENDED_KEYS}
                   onPress={handleCalculatorButton}
+                  theme={theme}
                 />
               )}
             </View>
@@ -430,34 +514,43 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#f5f7fb',
   },
-  tabs: {
+  headerRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 10,
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 8,
   },
+  tabs: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 10,
+  },
   tab: {
     alignItems: 'center',
     borderRadius: 18,
-    backgroundColor: '#e8ecf4',
     flex: 1,
     justifyContent: 'center',
     minHeight: 48,
     paddingHorizontal: 12,
   },
-  selectedTab: {
-    backgroundColor: '#23395d',
-  },
   tabLabel: {
-    color: '#46536a',
     fontSize: 15,
     fontWeight: '600',
   },
-  selectedTabLabel: {
-    color: '#ffffff',
+  themeToggle: {
+    alignItems: 'center',
+    borderRadius: 16,
+    borderWidth: 1,
+    justifyContent: 'center',
+    minHeight: 44,
+    paddingHorizontal: 12,
+  },
+  themeToggleText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
   page: {
     flex: 1,
